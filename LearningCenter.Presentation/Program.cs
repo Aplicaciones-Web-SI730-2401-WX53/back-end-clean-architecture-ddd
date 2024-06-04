@@ -63,6 +63,8 @@ builder.Services.AddDbContext<LearningCenterContext>(
         );
     });
 
+builder.Services.AddApplicationInsightsTelemetry();
+
 var app = builder.Build();
 
 app.UseMiddleware<ErrorHandlerMiddleware>();
@@ -72,7 +74,6 @@ using (var context = scope.ServiceProvider.GetService<LearningCenterContext>())
 {
     context.Database.EnsureCreated();
 }
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

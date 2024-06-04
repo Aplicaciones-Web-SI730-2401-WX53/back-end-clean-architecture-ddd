@@ -41,8 +41,8 @@ public class TutorialController : ControllerBase
     /// </returns>
 
     [HttpGet]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(typeof(List<TutorialResponse>), 200)]
+    [ProducesResponseType(typeof(void),statusCode: StatusCodes.Status404NotFound)]
     [ProducesResponseType(500)]
     [Produces(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> GetAsync()
@@ -68,7 +68,23 @@ public class TutorialController : ControllerBase
     }
 
     // GET: api/Tutorial/5
+    /// <summary>
+    /// Gets a Tutorial by ID.
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /api/Tutorial/{id}
+    ///
+    /// </remarks>
+    /// <param name="id">The ID of the tutorial</param>
+    /// <returns>The tutorial with the specified ID</returns>
+    /// <response code="200">Returns the tutorial</response>
+    /// <response code="404">If the tutorial is not found</response>
     [HttpGet("{id}", Name = "GetAsync")]
+    [ProducesResponseType(typeof(TutorialResponse), 200)]
+    [ProducesResponseType(typeof(void),statusCode: StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(void),StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAsync(int id)
     {
         var result = await _tutorialQueryService.Handle(new GetTutorialsByIdQuery(id));
@@ -79,10 +95,28 @@ public class TutorialController : ControllerBase
     }
 
     // POST: api/Tutorial
+    /// <summary>
+    /// Creates a new tutorial.
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST /api/tutorial
+    ///     {
+    ///        "name": "New tutorial",
+    ///        "description": ""
+    ///     }
+    ///
+    /// </remarks>
+    /// <param name="Tutorial">The tutorial to create</param>
+    /// <returns>A newly created tutorial</returns>
+    /// <response code="201">Returns the newly created tutorial</response>
+    /// <response code="409">Error validating data</response>
+    /// <response code="500">Unexpected error</response>
     [HttpPost]
-    [ProducesResponseType(201)]
-    [ProducesResponseType(404)]
-    [ProducesResponseType(500)]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(void),StatusCodes.Status500InternalServerError)]
 
     public async Task<IActionResult> PostAsync([FromBody] CreateTutorialCommand command)
     {
