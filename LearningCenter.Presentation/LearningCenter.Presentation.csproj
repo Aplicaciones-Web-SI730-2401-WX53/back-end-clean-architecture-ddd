@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>LearningCenter.Presentation</RootNamespace>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,6 +26,8 @@
     <ItemGroup>
         <Folder Include="Profiles\"/>
         <Folder Include="Publishing\"/>
+        <Folder Include="Purchase\" />
+        <Folder Include="Sales\" />
     </ItemGroup>
 
 </Project>

@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using _1_API.Response;
 using Application;
 using Infraestructure;
@@ -28,7 +29,22 @@ public class TutorialController : ControllerBase
 
 
     // GET: api/Tutorial
+    /// <summary>
+    /// Get all tutorial avalibles.
+    /// </summary>
+    /// <remarks>
+    ///  Example:
+    ///  GET api/Tutorial
+    ///   </remarks>
+    /// <returns>
+    /// the list of tutorials
+    /// </returns>
+
     [HttpGet]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
+    [Produces(MediaTypeNames.Application.Json)]
     public async Task<IActionResult> GetAsync()
     {
         var result = await _tutorialQueryService.Handle(new GetAllTutorialsQuery());
@@ -64,6 +80,10 @@ public class TutorialController : ControllerBase
 
     // POST: api/Tutorial
     [HttpPost]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
+
     public async Task<IActionResult> PostAsync([FromBody] CreateTutorialCommand command)
     {
         if (!ModelState.IsValid) return BadRequest();
