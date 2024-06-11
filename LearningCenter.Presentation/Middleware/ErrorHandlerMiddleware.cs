@@ -32,7 +32,7 @@ public class ErrorHandlerMiddleware
         var code = HttpStatusCode.InternalServerError;
         var result = ex.Message;
 
-        if (ex is TutorialNotException)
+        if (ex is TutorialNotException || ex is DuplicateNameException)
         {
             code = HttpStatusCode.NotFound;
         }

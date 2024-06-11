@@ -29,6 +29,7 @@
         <Folder Include="Publishing\"/>
         <Folder Include="Purchase\" />
         <Folder Include="Sales\" />
+        <Folder Include="Security\Controllers\" />
     </ItemGroup>
 
 </Project>

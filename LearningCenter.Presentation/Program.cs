@@ -1,9 +1,13 @@
 using System.Reflection;
 using _1_API.Mapper;
 using Application;
+using Application.Security.CommandServices;
 using Domain;
 using Infraestructure;
 using Infraestructure.Contexts;
+using LearningCenter.Domain.Security.Repositories;
+using LearningCenter.Domain.Security.Services;
+using LearningCenter.Infraestructure.Security.Persistencia;
 using LearningCenter.Presentation.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -54,6 +58,11 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<ITutorialRepository, TutorialRepository>();
 builder.Services.AddScoped<ITutorialCommandService, TutorialCommandService>();
 builder.Services.AddScoped<ITutorialQueryService, TutorialQueryService>();
+builder.Services.AddScoped<IUserCommandService, UserCommandService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEncryptService, EncryptService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 
 //AUtomapper
 builder.Services.AddAutoMapper(
@@ -98,6 +107,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors();
+app.UseCors("AllowAllPolicy");
 
 app.Run();
