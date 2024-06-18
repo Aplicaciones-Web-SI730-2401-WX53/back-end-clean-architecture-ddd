@@ -3,23 +3,22 @@ using LearningCenter.Domain.Security.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace Infraestructure.Contexts;
+namespace LearningCenter.Infraestructure.Shared.Contexts;
 
 public class LearningCenterContext : DbContext
 {
     private readonly IConfiguration _configuration;
-
     public LearningCenterContext(IConfiguration configuration)
     {
         _configuration = configuration;
     }
- 
-
-    public LearningCenterContext(DbContextOptions<LearningCenterContext> options) : base(options)
+    
+    public LearningCenterContext(DbContextOptions<LearningCenterContext> options, IConfiguration configuration) : base(options)
     {
+        _configuration = configuration;
     }
 
-    public DbSet<Tutorial> Tutorials { get; set; }
+    public DbSet<Tutorial?> Tutorials { get; set; }
     public DbSet<Section> Sections { get; set; }
     public DbSet<User> Users { get; set; }
 

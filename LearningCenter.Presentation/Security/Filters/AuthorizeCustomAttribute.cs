@@ -14,7 +14,6 @@ public class AuthorizeCustomAttribute : Attribute,IAsyncAuthorizationFilter
         _roles = roles;
     }
     
-    
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
       var user = context.HttpContext.Items["User"] as User;

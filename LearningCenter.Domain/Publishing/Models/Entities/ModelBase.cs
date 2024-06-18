@@ -4,7 +4,8 @@ namespace Domain;
 
 public class ModelBase
 {
-    public int Id { get; set; }
+   /// public Guid Id { get; set; } =  Guid.NewGuid();
+    public int Id { get; set; } 
 
     public int CreatedUser { get; set; }
 

@@ -4,10 +4,10 @@ using Application;
 using Application.Security.CommandServices;
 using Domain;
 using Infraestructure;
-using Infraestructure.Contexts;
 using LearningCenter.Domain.Security.Repositories;
 using LearningCenter.Domain.Security.Services;
 using LearningCenter.Infraestructure.Security.Persistencia;
+using LearningCenter.Infraestructure.Shared.Contexts;
 using LearningCenter.Presentation.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +18,12 @@ var builder = WebApplication.CreateBuilder(args);
 //Ad cors
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllPolicy", 
+    options.AddPolicy("AllowAllPolicy",
         policy => policy.AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
+
 
 // Configuration
 var configuration = new ConfigurationBuilder()
@@ -32,60 +33,60 @@ var configuration = new ConfigurationBuilder()
 
 builder.Services.AddSingleton(configuration);
 
-
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Version = "v1",
-        Title = "Learning center API",
-        Description = "An ASP.NET Core Web API for managing tutorials",
-        TermsOfService = new Uri("https://example.com/terms"),
-        Contact = new OpenApiContact
+        options.SwaggerDoc("v1", new OpenApiInfo
         {
-            Name = "Example Contact",
-            Url = new Uri("https://example.com/contact")
-        },
-        License = new OpenApiLicense
-        {
-            Name = "Example License",
-            Url = new Uri("https://example.com/license")
-        }
-    });
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please enter token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        Scheme = "bearer"
-    });
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
+            Version = "v1",
+            Title = "Learning center API",
+            Description = "An ASP.NET Core Web API for managing tutorials",
+            TermsOfService = new Uri("https://example.com/terms"),
+            Contact = new OpenApiContact
             {
-                Reference = new OpenApiReference
-                {
-                    Id = "Bearer",
-                    Type = ReferenceType.SecurityScheme
-                }
+                Name = "Example Contact",
+                Url = new Uri("https://example.com/contact")
             },
-            Array.Empty<string>()
-        }
-    });
+            License = new OpenApiLicense
+            {
+                Name = "Example License",
+                Url = new Uri("https://example.com/license")
+            }
+        });
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Please enter token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "bearer"
+        });
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = "Bearer",
+                        Type = ReferenceType.SecurityScheme
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
 
-    
-    // using System.Reflection;
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-});
+        // using System.Reflection;
+        var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    }
+);
+
 
 //dependency inyection
 builder.Services.AddScoped<ITutorialRepository, TutorialRepository>();
@@ -96,10 +97,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEncryptService, EncryptService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-//Authorization
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer();
-
 
 //AUtomapper
 builder.Services.AddAutoMapper(
@@ -123,8 +123,6 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
-app.UseMiddleware<ErrorHandlerMiddleware>();
-
 using (var scope = app.Services.CreateScope())
 using (var context = scope.ServiceProvider.GetService<LearningCenterContext>())
 {
@@ -142,11 +140,11 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAllPolicy");
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 //app.UseAuthorization();
 
-app.UseAuthentication();
+app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseMiddleware<AuthenticacionMiddleware>();
-
 app.MapControllers();
 
 app.Run();

@@ -1,5 +1,5 @@
 using Domain;
-using Infraestructure.Contexts;
+using LearningCenter.Infraestructure.Shared.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infraestructure;
@@ -31,26 +31,33 @@ public class TutorialRepository : ITutorialRepository
         return result;
     }
 
-    public async Task<Tutorial> GetById(int id)
+    public async Task<Tutorial?> GetById(int id)
     {
-        return await _learningCenterContext.Tutorials.Where(t => t.Id == id && t.IsActive)
+        return await _learningCenterContext.Tutorials
+            .Where(t => t.Id == id && t.IsActive)
             .Include(t => t.Sections)
             .FirstOrDefaultAsync();
     }
 
     public async Task<Tutorial> GetByNameAsync(string name)
     {
-        return await _learningCenterContext.Tutorials.Where(t => t.Name == name && t.IsActive).FirstOrDefaultAsync();
+        return await _learningCenterContext.Tutorials
+            .Where(t => t.Name == name && t.IsActive)
+            .FirstOrDefaultAsync();
     }
 
-    public async Task<int> SaveAsync(Tutorial data)
+    public async Task<int> SaveAsync(Tutorial? data)
     {
-        using (var transaction = await _learningCenterContext.Database.BeginTransactionAsync())
+        await using (var transaction = await _learningCenterContext.Database.BeginTransactionAsync())
         {
             try
             {
-                data.IsActive = true;
-                _learningCenterContext.Tutorials.Add(data); //no se refleja en BBDD
+                if (data != null)
+                {
+                    data.IsActive = true;
+                    _learningCenterContext.Tutorials.Add(data); //no se refleja en BBDD
+                }
+
                 await _learningCenterContext.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
@@ -61,17 +68,20 @@ public class TutorialRepository : ITutorialRepository
             }
         }
 
-
-        return data.Id;
+        if (data != null) return data.Id;
+        return 0;
     }
 
     public async Task<bool> Update(Tutorial data, int id)
     {
-        var exitingTutorial = _learningCenterContext.Tutorials.Where(t => t.Id == id).FirstOrDefault();
-        exitingTutorial.Name = data.Name;
-        exitingTutorial.Description = data.Description;
+        var exitingTutorial = _learningCenterContext.Tutorials.FirstOrDefault(t => t.Id == id);
+        if (exitingTutorial != null)
+        {
+            exitingTutorial.Name = data.Name;
+            exitingTutorial.Description = data.Description;
 
-        _learningCenterContext.Tutorials.Update(exitingTutorial);
+            _learningCenterContext.Tutorials.Update(exitingTutorial);
+        }
 
         await _learningCenterContext.SaveChangesAsync();
         return true;
@@ -79,12 +89,15 @@ public class TutorialRepository : ITutorialRepository
 
     public async Task<bool>  Delete(int id)
     {
-        var exitingTutorial = _learningCenterContext.Tutorials.Where(t => t.Id == id).FirstOrDefault();
+        var exitingTutorial = _learningCenterContext.Tutorials.FirstOrDefault(t => t.Id == id);
 
         // _learningCenterContext.Tutorials.Remove(exitingTutorial);
-        exitingTutorial.IsActive = false;
+        if (exitingTutorial != null)
+        {
+            exitingTutorial.IsActive = false;
 
-        _learningCenterContext.Tutorials.Update(exitingTutorial);
+            _learningCenterContext.Tutorials.Update(exitingTutorial);
+        }
 
         await _learningCenterContext.SaveChangesAsync();
         return true;

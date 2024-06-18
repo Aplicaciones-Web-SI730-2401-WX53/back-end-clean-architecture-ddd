@@ -1,6 +1,6 @@
-using Infraestructure.Contexts;
 using LearningCenter.Domain.Security.Models;
 using LearningCenter.Domain.Security.Repositories;
+using LearningCenter.Infraestructure.Shared.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace LearningCenter.Infraestructure.Security.Persistencia;

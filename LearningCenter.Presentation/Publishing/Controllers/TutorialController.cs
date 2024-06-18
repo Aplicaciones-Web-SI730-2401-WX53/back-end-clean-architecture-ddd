@@ -1,18 +1,17 @@
 using System.Net.Mime;
 using _1_API.Response;
-using Application;
-using Infraestructure;
 using AutoMapper;
 using Domain;
 using LearningCenter.Domain.Publishing.Models.Queries;
-using LearningCenter.Presentation.Security.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Presentation.Request;
 
 namespace Presentation.Controllers;
 
+/// <summary>
+/// 
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class TutorialController : ControllerBase
@@ -21,6 +20,12 @@ public class TutorialController : ControllerBase
     private readonly ITutorialCommandService _tutorialCommandService;
     private readonly ITutorialQueryService _tutorialQueryService;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tutorialQueryService"></param>
+    /// <param name="tutorialCommandService"></param>
+    /// <param name="mapper"></param>
     public TutorialController(ITutorialQueryService tutorialQueryService, ITutorialCommandService tutorialCommandService,
         IMapper mapper)
     {
@@ -47,26 +52,32 @@ public class TutorialController : ControllerBase
     [ProducesResponseType(typeof(void),statusCode: StatusCodes.Status404NotFound)]
     [ProducesResponseType(500)]
     [Produces(MediaTypeNames.Application.Json)]
-    [Authorize(Roles = "mkt,admin,account")]
+    [Authorize(Roles = "mkt,admin")]
     public async Task<IActionResult> GetAsync()
     {
         var result = await _tutorialQueryService.Handle(new GetAllTutorialsQuery());
         
-        if (result.Count == 0) return NotFound();
+        if (result != null && result.Count == 0) return NotFound();
 
         return Ok(result);
     }
 
     // GET: api/Tutorial/Search
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="year"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("Search")]
-    [Authorize(Roles = "mkt,admin,account")]
+    [Authorize(Roles = "mkt,admin")]
     public async Task<IActionResult> GetSearchAsync(string? name, int? year)
     {
         //var data = await _tutorialRepository.GetSearchAsync(name, year);
 
         var result = await _tutorialQueryService.Handle(new GetAllTutorialsQuery());
-        if (result.Count == 0) return NotFound();
+        if (result != null && result.Count == 0) return NotFound();
 
         return Ok(result);
     }
@@ -89,7 +100,7 @@ public class TutorialController : ControllerBase
     [ProducesResponseType(typeof(TutorialResponse), 200)]
     [ProducesResponseType(typeof(void),statusCode: StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(void),StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "mkt,admin,account")]
+    [Authorize(Roles = "mkt,admin")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var result = await _tutorialQueryService.Handle(new GetTutorialsByIdQuery(id));
@@ -105,15 +116,15 @@ public class TutorialController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Sample request:
-    ///
+    /// 
     ///     POST /api/tutorial
     ///     {
     ///        "name": "New tutorial",
     ///        "description": ""
     ///     }
-    ///
+    /// 
     /// </remarks>
-    /// <param name="Tutorial">The tutorial to create</param>
+    /// <param name="command"></param>
     /// <returns>A newly created tutorial</returns>
     /// <response code="201">Returns the newly created tutorial</response>
     /// <response code="409">Error validating data</response>
@@ -137,6 +148,12 @@ public class TutorialController : ControllerBase
     }
 
     // PUT: api/Tutorial/5
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
     [HttpPut("{id}")]
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] UpdateTutorialCommand command)
@@ -150,6 +167,11 @@ public class TutorialController : ControllerBase
     }
 
     // DELETE: api/Tutorial/5
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
