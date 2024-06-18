@@ -1,14 +1,19 @@
 using Domain;
 using LearningCenter.Domain.Security.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Infraestructure.Contexts;
 
 public class LearningCenterContext : DbContext
 {
-    public LearningCenterContext()
+    private readonly IConfiguration _configuration;
+
+    public LearningCenterContext(IConfiguration configuration)
     {
+        _configuration = configuration;
     }
+ 
 
     public LearningCenterContext(DbContextOptions<LearningCenterContext> options) : base(options)
     {
@@ -23,7 +28,7 @@ public class LearningCenterContext : DbContext
         if (!optionsBuilder.IsConfigured)
         {
             var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
-            optionsBuilder.UseMySql("Server=localhost,3306;Uid=root;Pwd=Upc123!;Database=learningcenterwx53;",
+            optionsBuilder.UseMySql(_configuration["ConnectionStrings:learningCenterConnection"],
                 serverVersion);
         }
     }

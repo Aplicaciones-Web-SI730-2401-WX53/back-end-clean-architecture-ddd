@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using LearningCenter.Domain.Security.Models;
 using LearningCenter.Domain.Security.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -9,10 +10,16 @@ namespace Application.Security.CommandServices;
 
 public class TokenService : ITokenService
 {
-    string secret = "learnig-center-upc-wx-2024-asdasdadadadasd";
+    private readonly IConfiguration _configuration;
+    
+    public TokenService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+    
     public string GenerateToken(User user)
     {
-        var key = Encoding.ASCII.GetBytes(secret);
+        var key = Encoding.ASCII.GetBytes(_configuration["AppSettings:Secret"]);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
@@ -39,7 +46,7 @@ public class TokenService : ITokenService
             return null;
         // Otherwise, perform validation
         var tokenHandler = new JsonWebTokenHandler();
-        var key = Encoding.ASCII.GetBytes(secret);
+        var key = Encoding.ASCII.GetBytes(_configuration["AppSettings:Secret"]);
         try
         {
             var tokenValidationResult = await tokenHandler.ValidateTokenAsync(token, new TokenValidationParameters
