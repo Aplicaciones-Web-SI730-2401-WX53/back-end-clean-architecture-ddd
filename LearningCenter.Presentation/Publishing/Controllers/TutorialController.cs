@@ -3,6 +3,7 @@ using _1_API.Response;
 using AutoMapper;
 using Domain;
 using LearningCenter.Domain.Publishing.Models.Queries;
+using LearningCenter.Presentation.Security.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Request;
@@ -52,7 +53,7 @@ public class TutorialController : ControllerBase
     [ProducesResponseType(typeof(void),statusCode: StatusCodes.Status404NotFound)]
     [ProducesResponseType(500)]
     [Produces(MediaTypeNames.Application.Json)]
-    [Authorize(Roles = "mkt,admin")]
+    [CustomAuthorize("mkt")]
     public async Task<IActionResult> GetAsync()
     {
         var result = await _tutorialQueryService.Handle(new GetAllTutorialsQuery());
@@ -71,7 +72,7 @@ public class TutorialController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("Search")]
-    [Authorize(Roles = "mkt,admin")]
+    [CustomAuthorize("mkt")]
     public async Task<IActionResult> GetSearchAsync(string? name, int? year)
     {
         //var data = await _tutorialRepository.GetSearchAsync(name, year);
@@ -100,7 +101,7 @@ public class TutorialController : ControllerBase
     [ProducesResponseType(typeof(TutorialResponse), 200)]
     [ProducesResponseType(typeof(void),statusCode: StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(void),StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "mkt,admin")]
+    [CustomAuthorize("mkt")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var result = await _tutorialQueryService.Handle(new GetTutorialsByIdQuery(id));
@@ -133,7 +134,7 @@ public class TutorialController : ControllerBase
     [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(void),StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "admin")]
+    [CustomAuthorize("admin")]
     public async Task<IActionResult> PostAsync([FromBody] CreateTutorialCommand command)
     {
         if (!ModelState.IsValid) return BadRequest();

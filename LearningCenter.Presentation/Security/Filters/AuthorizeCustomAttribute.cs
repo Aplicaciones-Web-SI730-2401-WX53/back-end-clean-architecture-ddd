@@ -5,22 +5,22 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace LearningCenter.Presentation.Security.Filters;
 
-public class AuthorizeCustomAttribute : Attribute,IAsyncAuthorizationFilter
+
+public class CustomAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
 {
     private readonly string[] _roles;
-    
-    public AuthorizeCustomAttribute(params string[] roles)
+
+    public CustomAuthorizeAttribute(params string[] roles)
     {
         _roles = roles;
     }
-    
+
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-      var user = context.HttpContext.Items["User"] as User;
-
-      if (user == null || !_roles.Any(role => user.Role.Contains(role)))
-      {
-          context.Result = new UnauthorizedResult();
-      }
+        var user = context.HttpContext.Items["User"] as User;
+        if (user == null || !_roles.Any(role => user.Role.Contains(role)))
+        {
+            context.Result = new ForbidResult();
+        }
     }
 }
