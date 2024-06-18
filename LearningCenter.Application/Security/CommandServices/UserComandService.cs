@@ -42,7 +42,7 @@ public class UserCommandService : IUserCommandService
         if( !_encryptService.VerifyPassword(command.Password, existignUser.PasswordHashed))
             throw new DuplicateNameException("Invalid password or username");
         
-        var user = new User(){Username = command.Username};
+        var user = new User(){Id = existignUser.Id, Username = command.Username};
         var token = _tokenService.GenerateToken(user);
         
         return token;

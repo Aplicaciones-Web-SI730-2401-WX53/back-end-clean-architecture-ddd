@@ -34,9 +34,10 @@ public class UserRepository : IUserRepository
     }
 
 
-    public async Task<User> GetUserById(Guid id)
+    public async Task<User> GetUserById(int id)
     {
-        throw new NotImplementedException();
+        var user =  await _learningCenterContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+        return user;
     }
 
     public async Task Update(User user)
